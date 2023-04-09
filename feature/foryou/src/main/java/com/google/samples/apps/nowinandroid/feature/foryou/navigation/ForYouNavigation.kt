@@ -16,11 +16,13 @@
 
 package com.google.samples.apps.nowinandroid.feature.foryou.navigation
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.google.samples.apps.nowinandroid.feature.foryou.ForYouRoute
+import io.sentry.compose.SentryTraced
 
 const val forYouNavigationRoute = "for_you_route"
 
@@ -28,8 +30,11 @@ fun NavController.navigateToForYou(navOptions: NavOptions? = null) {
     this.navigate(forYouNavigationRoute, navOptions)
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 fun NavGraphBuilder.forYouScreen(onTopicClick: (String) -> Unit) {
     composable(route = forYouNavigationRoute) {
-        ForYouRoute(onTopicClick)
+        SentryTraced(tag = "forYouScreen") {
+            ForYouRoute(onTopicClick)
+        }
     }
 }

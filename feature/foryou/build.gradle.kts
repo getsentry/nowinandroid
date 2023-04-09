@@ -30,4 +30,5 @@ dependencies {
     implementation(libs.accompanist.flowlayout)
     implementation(libs.kotlinx.datetime)
     implementation(libs.androidx.activity.compose)
+    implementation("io.sentry:sentry-compose-android:6.17.0")
 }

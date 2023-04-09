@@ -86,6 +86,7 @@ import com.google.samples.apps.nowinandroid.core.ui.TrackScreenViewEvent
 import com.google.samples.apps.nowinandroid.core.ui.TrackScrollJank
 import com.google.samples.apps.nowinandroid.core.ui.UserNewsResourcePreviewParameterProvider
 import com.google.samples.apps.nowinandroid.core.ui.newsFeed
+import io.sentry.Sentry
 
 @Composable
 internal fun ForYouRoute(
@@ -124,7 +125,13 @@ internal fun ForYouScreen(
     val isFeedLoading = feedState is NewsFeedUiState.Loading
 
     // This code should be called when the UI is ready for use and relates to Time To Full Display.
-    ReportDrawnWhen { !isSyncing && !isOnboardingLoading && !isFeedLoading }
+    ReportDrawnWhen {
+        val shouldReport = !isSyncing && !isOnboardingLoading && !isFeedLoading
+        if (shouldReport) {
+            Sentry.reportFullyDisplayed()
+        }
+        shouldReport
+    }
 
     val state = rememberLazyGridState()
     TrackScrollJank(scrollableState = state, stateName = "forYou:feed")

@@ -17,6 +17,7 @@
 package com.google.samples.apps.nowinandroid.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -26,6 +27,10 @@ import com.google.samples.apps.nowinandroid.feature.foryou.navigation.forYouScre
 import com.google.samples.apps.nowinandroid.feature.interests.navigation.interestsGraph
 import com.google.samples.apps.nowinandroid.feature.topic.navigation.navigateToTopic
 import com.google.samples.apps.nowinandroid.feature.topic.navigation.topicScreen
+import io.sentry.Sentry
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * Top-level navigation graph. Navigation is organized as explained at
@@ -40,6 +45,7 @@ fun NiaNavHost(
     modifier: Modifier = Modifier,
     startDestination: String = forYouNavigationRoute,
 ) {
+    val scope = rememberCoroutineScope()
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -59,5 +65,13 @@ fun NiaNavHost(
                 )
             },
         )
+        scope.launch(Dispatchers.Default) {
+            delay(500)
+            Sentry.reportFullyDisplayed()
+            Sentry.configureScope {
+                it.transaction?.spans?.forEach { span -> span.finish() }
+                it.transaction?.finish()
+            }
+        }
     }
 }

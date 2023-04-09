@@ -16,6 +16,7 @@
 
 package com.google.samples.apps.nowinandroid.feature.bookmarks
 
+import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -37,10 +38,14 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -62,7 +67,14 @@ import com.google.samples.apps.nowinandroid.core.ui.TrackScreenViewEvent
 import com.google.samples.apps.nowinandroid.core.ui.TrackScrollJank
 import com.google.samples.apps.nowinandroid.core.ui.UserNewsResourcePreviewParameterProvider
 import com.google.samples.apps.nowinandroid.core.ui.newsFeed
+import io.sentry.Sentry
+import io.sentry.compose.SentryTraced
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.io.File
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun BookmarksRoute(
     onTopicClick: (String) -> Unit,
@@ -70,12 +82,43 @@ internal fun BookmarksRoute(
     viewModel: BookmarksViewModel = hiltViewModel(),
 ) {
     val feedState by viewModel.feedUiState.collectAsStateWithLifecycle()
+//    Sentry.startTransaction("Render Time", "ui.load", true)
     BookmarksScreen(
         feedState = feedState,
         removeFromBookmarks = viewModel::removeFromSavedResources,
         onTopicClick = onTopicClick,
         modifier = modifier,
     )
+
+    //fileIOMainThread()
+
+//    val scope = rememberCoroutineScope()
+//    LaunchedEffect(Unit) {
+//        scope.launch(Dispatchers.Default) {
+//            delay(10000)
+//            Sentry.configureScope { it.transaction?.finish() }
+//        }
+//    }
+
+}
+
+@Composable
+private fun fileIOMainThread() {
+    val context = LocalContext.current
+    val res = context.resources.openRawResource(R.raw.big)
+    val file = File(context.cacheDir, "test.png")
+    file.writeBytes(res.readBytes())
+    file.writeBytes(file.readBytes())
+    file.writeBytes(file.readBytes())
+    file.writeBytes(file.readBytes())
+
+    val input = context.resources.openRawResource(R.raw.big)
+    val output = context.openFileOutput("testt.png", Context.MODE_PRIVATE)
+    var b = input.read()
+    while (b != -1) {
+        output.write(b)
+        b = input.read()
+    }
 }
 
 /**

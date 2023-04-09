@@ -23,6 +23,7 @@ plugins {
     id("nowinandroid.android.hilt")
     id("jacoco")
     id("nowinandroid.android.application.firebase")
+    id("io.sentry.android.gradle") version "3.5.0"
 }
 
 android {

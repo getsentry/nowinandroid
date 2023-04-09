@@ -16,11 +16,13 @@
 
 package com.google.samples.apps.nowinandroid.feature.bookmarks.navigation
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.google.samples.apps.nowinandroid.feature.bookmarks.BookmarksRoute
+import io.sentry.compose.SentryTraced
 
 const val bookmarksRoute = "bookmarks_route"
 
@@ -28,8 +30,11 @@ fun NavController.navigateToBookmarks(navOptions: NavOptions? = null) {
     this.navigate(bookmarksRoute, navOptions)
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 fun NavGraphBuilder.bookmarksScreen(onTopicClick: (String) -> Unit) {
     composable(route = bookmarksRoute) {
-        BookmarksRoute(onTopicClick)
+        SentryTraced(tag = "bookmarksScreen") {
+            BookmarksRoute(onTopicClick)
+        }
     }
 }

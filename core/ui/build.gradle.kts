@@ -37,6 +37,7 @@ dependencies {
     api(libs.androidx.compose.ui.util)
     api(libs.androidx.metrics)
     api(libs.androidx.tracing.ktx)
+    api("io.sentry:sentry-compose-android:6.17.0")
 
     debugApi(libs.androidx.compose.ui.tooling)
 

@@ -24,3 +24,7 @@ plugins {
 android {
     namespace = "com.google.samples.apps.nowinandroid.feature.interests"
 }
+
+dependencies {
+    implementation("io.sentry:sentry-compose-android:6.17.0")
+}

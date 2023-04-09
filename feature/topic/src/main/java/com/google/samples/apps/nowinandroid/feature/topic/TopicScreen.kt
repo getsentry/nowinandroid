@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -60,7 +61,9 @@ import com.google.samples.apps.nowinandroid.core.ui.UserNewsResourcePreviewParam
 import com.google.samples.apps.nowinandroid.core.ui.userNewsResourceCardItems
 import com.google.samples.apps.nowinandroid.feature.topic.R.string
 import com.google.samples.apps.nowinandroid.feature.topic.TopicUiState.Loading
+import io.sentry.compose.SentryTraced
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun TopicRoute(
     onBackClick: () -> Unit,
@@ -71,16 +74,19 @@ internal fun TopicRoute(
     val topicUiState: TopicUiState by viewModel.topicUiState.collectAsStateWithLifecycle()
     val newsUiState: NewsUiState by viewModel.newUiState.collectAsStateWithLifecycle()
 
+
+    SentryTraced(tag = "topic_screen") {
+        TopicScreen(
+            topicUiState = topicUiState,
+            newsUiState = newsUiState,
+            modifier = modifier,
+            onBackClick = onBackClick,
+            onFollowClick = viewModel::followTopicToggle,
+            onBookmarkChanged = viewModel::bookmarkNews,
+            onTopicClick = onTopicClick,
+        )
+    }
     TrackScreenViewEvent(screenName = "Topic: ${viewModel.topicId}")
-    TopicScreen(
-        topicUiState = topicUiState,
-        newsUiState = newsUiState,
-        modifier = modifier,
-        onBackClick = onBackClick,
-        onFollowClick = viewModel::followTopicToggle,
-        onBookmarkChanged = viewModel::bookmarkNews,
-        onTopicClick = onTopicClick,
-    )
 }
 
 @VisibleForTesting

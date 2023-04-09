@@ -16,12 +16,14 @@
 
 package com.google.samples.apps.nowinandroid.feature.interests.navigation
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.google.samples.apps.nowinandroid.feature.interests.InterestsRoute
+import io.sentry.compose.SentryTraced
 
 private const val interestsGraphRoutePattern = "interests_graph"
 const val interestsRoute = "interests_route"
@@ -30,6 +32,7 @@ fun NavController.navigateToInterestsGraph(navOptions: NavOptions? = null) {
     this.navigate(interestsGraphRoutePattern, navOptions)
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 fun NavGraphBuilder.interestsGraph(
     onTopicClick: (String) -> Unit,
     nestedGraphs: NavGraphBuilder.() -> Unit,
@@ -39,7 +42,9 @@ fun NavGraphBuilder.interestsGraph(
         startDestination = interestsRoute,
     ) {
         composable(route = interestsRoute) {
-            InterestsRoute(onTopicClick)
+            SentryTraced(tag = "interestsScreen") {
+                InterestsRoute(onTopicClick)
+            }
         }
         nestedGraphs()
     }

@@ -28,4 +28,5 @@ android {
 
 dependencies {
     implementation(libs.androidx.compose.material3.windowSizeClass)
+    implementation("io.sentry:sentry-compose-android:6.17.0")
 }

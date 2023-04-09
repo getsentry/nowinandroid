@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
@@ -42,11 +43,13 @@ import androidx.compose.ui.unit.dp
 import com.google.samples.apps.nowinandroid.core.analytics.LocalAnalyticsHelper
 import com.google.samples.apps.nowinandroid.core.designsystem.theme.NiaTheme
 import com.google.samples.apps.nowinandroid.core.domain.model.UserNewsResource
+import io.sentry.compose.SentryTraced
 
 /**
  * An extension on [LazyListScope] defining a feed with news resources.
  * Depending on the [feedState], this might emit no items.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 fun LazyGridScope.newsFeed(
     feedState: NewsFeedUiState,
     onNewsResourcesCheckedChanged: (String, Boolean) -> Unit,
@@ -63,25 +66,27 @@ fun LazyGridScope.newsFeed(
                 val analyticsHelper = LocalAnalyticsHelper.current
                 val backgroundColor = MaterialTheme.colorScheme.background.toArgb()
 
-                NewsResourceCardExpanded(
-                    userNewsResource = userNewsResource,
-                    isBookmarked = userNewsResource.isSaved,
-                    onClick = {
-                        analyticsHelper.logNewsResourceOpened(
-                            newsResourceId = userNewsResource.id,
-                            newsResourceTitle = userNewsResource.title,
-                        )
-                        launchCustomChromeTab(context, resourceUrl, backgroundColor)
-                    },
-                    onToggleBookmark = {
-                        onNewsResourcesCheckedChanged(
-                            userNewsResource.id,
-                            !userNewsResource.isSaved,
-                        )
-                    },
-                    onTopicClick = onTopicClick,
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                )
+                SentryTraced(tag = "news_${userNewsResource.id}") {
+                    NewsResourceCardExpanded(
+                        userNewsResource = userNewsResource,
+                        isBookmarked = userNewsResource.isSaved,
+                        onClick = {
+                            analyticsHelper.logNewsResourceOpened(
+                                newsResourceId = userNewsResource.id,
+                                newsResourceTitle = userNewsResource.title,
+                            )
+                            launchCustomChromeTab(context, resourceUrl, backgroundColor)
+                        },
+                        onToggleBookmark = {
+                            onNewsResourcesCheckedChanged(
+                                userNewsResource.id,
+                                !userNewsResource.isSaved,
+                            )
+                        },
+                        onTopicClick = onTopicClick,
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                    )
+                }
             }
         }
     }

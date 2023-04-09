@@ -29,8 +29,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Modifier.Companion
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -40,6 +44,11 @@ import com.google.samples.apps.nowinandroid.core.designsystem.component.NiaIconT
 import com.google.samples.apps.nowinandroid.core.designsystem.icon.NiaIcons
 import com.google.samples.apps.nowinandroid.core.designsystem.theme.NiaTheme
 import com.google.samples.apps.nowinandroid.feature.interests.R.string
+import io.sentry.Sentry
+import io.sentry.UserFeedback
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun InterestsItem(
@@ -61,8 +70,11 @@ fun InterestsItem(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .weight(1f)
-                .clickable { onClick() }
-                .padding(vertical = itemSeparation),
+                .clickable {
+                    onClick()
+                }
+                .padding(vertical = itemSeparation)
+                .testTag("topic_item"),
         ) {
             InterestsIcon(topicImageUrl, iconModifier.size(64.dp))
             Spacer(modifier = Modifier.width(24.dp))
@@ -70,6 +82,7 @@ fun InterestsItem(
         }
         NiaIconToggleButton(
             checked = following,
+            modifier = Modifier.testTag("follow_topic"),
             onCheckedChange = onFollowButtonClick,
             icon = {
                 Icon(
